@@ -1,4 +1,4 @@
-package serve;
+package serves;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -15,5 +15,6 @@ public interface UpAndDwServe {
     //得到文件流加密后存储
     public void file2Aes(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException;
 
-
+    //下载文件
+    public void dpwnloadFile(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException;
 }

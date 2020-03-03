@@ -33,7 +33,7 @@ public class SymmetricEncoderTest {
         System.out.println("使用AES对称解密，请输入加密的规则：(须与加密相同)");
         encodeRules="123";
         System.out.println("请输入要解密的内容（密文）:");
-        content = "HV2fjrI3pH1Qjm3PhEOoJg==";
+        content = "ET5pqdBRoBECR2a/u10deQ==";
         System.out.println("根据输入的规则"+encodeRules+"解密后的明文是:"+se.AESDncode(encodeRules, content));
     }
 }

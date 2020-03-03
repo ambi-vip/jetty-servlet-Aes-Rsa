@@ -1,11 +1,12 @@
 package servlet;
 
 import entity.MyFile;
-import serve.MyFileServe;
-import serve.impl.MyFileServeImpl;
+import serves.MyFileServe;
+import serves.impl.MyFileServeImpl;
 import until.GetJson;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,6 +19,7 @@ import java.util.List;
  * @version 1.0
  * @date 2020/3/2 9:30
  */
+@WebServlet("FileList")
 public class FileLiset extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -43,7 +45,6 @@ public class FileLiset extends HttpServlet {
 
             PrintWriter out = resp.getWriter();
             String ok = GetJson.toJson(allFile,0,"s");
-            System.out.println(ok);
             out.write(ok);
         }catch (Exception e){
             e.printStackTrace();

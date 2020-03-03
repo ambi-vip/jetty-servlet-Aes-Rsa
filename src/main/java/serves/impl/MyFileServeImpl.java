@@ -1,8 +1,8 @@
-package serve.impl;
+package serves.impl;
 
 import dao.FileDao;
 import entity.MyFile;
-import serve.MyFileServe;
+import serves.MyFileServe;
 
 import java.util.List;
 

@@ -4,6 +4,7 @@ import servlet.DownLoad;
 import servlet.FileLiset;
 import servlet.Upload;
 
+import javax.servlet.annotation.WebFilter;
 import java.io.File;
 import java.net.InetSocketAddress;
 
@@ -20,10 +21,12 @@ public class WebAppContextWithWarServer {
         Server server = new Server(address);
 
         ServletContextHandler handler = new ServletContextHandler();
+
         handler.addServlet(Upload.class,"/Upload");
         handler.addServlet(FileLiset.class,"/FileList");
         handler.addServlet(DownLoad.class,"/DownLoad");
         server.setHandler(handler);
+
         server.start();
         server.join();
     }

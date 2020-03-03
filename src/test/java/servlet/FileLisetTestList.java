@@ -2,12 +2,10 @@ package servlet;
 
 import entity.MyFile;
 import org.junit.Test;
-import serve.MyFileServe;
-import serve.impl.MyFileServeImpl;
+import serves.MyFileServe;
+import serves.impl.MyFileServeImpl;
 
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 /**
  * @author Ambi

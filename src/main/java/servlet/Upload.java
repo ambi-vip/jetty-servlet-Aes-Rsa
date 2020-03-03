@@ -2,29 +2,16 @@ package servlet;
 
 
 
-import entity.MyFile;
-import org.eclipse.jetty.server.Request;
-import serve.MyFileServe;
-import serve.UpAndDwServe;
-import serve.impl.MyFileServeImpl;
-import serve.impl.UpAndDwServeImpl;
-import until.GetJson;
+import serves.UpAndDwServe;
+import serves.impl.UpAndDwServeImpl;
 
-import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
-import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Date;
-import java.util.UUID;
 
 /**
  * @author Ambi
@@ -39,6 +26,9 @@ import java.util.UUID;
 public class Upload extends HttpServlet {
 
     private UpAndDwServe upAndDwServe = new UpAndDwServeImpl();
+    //公钥
+    private String pubKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC8HMr2CBpoZPm3t9tCVlrKtTmI4jNJc7/HhxjIEiDjC8czP4PV+44LjXvLYcSV0fwi6nE4LH2c5PBPEnPfqp0g8TZeX+bYGvd70cXee9d8wHgBqi4k0J0X33c0ZnW7JruftPyvJo9OelYSofBXQTcwI+3uIl/YvrgQRv6A5mW01QIDAQAB";
+
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)

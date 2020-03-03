@@ -93,11 +93,19 @@ public class FileDao {
             Class.forName("org.apache.derby.jdbc.EmbeddedDriver");//加载驱动
             Connection conn = DriverManager.getConnection("jdbc:derby:derbyDB;create=true","user","pwd");
             Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery(" select * from FILES ");
+            //只显示最近10条数据
+            /**
+             * SELECT * FROM YOUR_TABLE
+             * OFFSET ? ROWS
+             * FETCH NEXT ? ROWS ONLY;
+             * 稍微解释一下：
+             * OFFSET ? ROWS - 是指跳过 ? 条记录
+             * FETCH NEXT ? ROWS ONLY - 是指抓取下一个 ? 条记录
+             */
+            ResultSet rs = st.executeQuery(" select * from FILES order by CREATE_AT desc FETCH NEXT 10 ROWS ONLY   ");
             List<MyFile> list = new ArrayList<>();
             while(rs.next())
             {
-                System.out.println(rs.getObject(1)+"---->"+rs.getObject(2));
                 MyFile file = new MyFile();
                 file.setUid(rs.getString(1).trim());
                 file.setFileSize(rs.getInt(2));
@@ -109,14 +117,13 @@ public class FileDao {
                 file.setIsDel(rs.getInt(8));
                 list.add(file);
             }
-
-            // st.execute("drop table DBINFO");
             rs.close();
             return list;
         } catch (ClassNotFoundException | SQLException ex) {
             ex.printStackTrace();
             return null;
         }finally{
+            System.out.println("查询全部数据！");
 //            try {
 //                DriverManager.getConnection("jdbc:derby:;shutdown=true");
 //            } catch (SQLException ex) {
