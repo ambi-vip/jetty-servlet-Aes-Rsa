@@ -1,0 +1,30 @@
+spring:
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  devtools:
+    restart:
+      enabled: true
+  datasource:
+    url: jdbc:mysql://localhost:3306/qiyue?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT
+    username: root
+    password: root
+    driver-class-name: com.mysql.jdbc.Driver
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+#    database-platform: org.hibernate.dialect.MySQLInnoDBDialect #\u4E3B\u8981\u662F\u6307\u5B9A\u751F\u6210\u8868\u540D\u7684\u5B58\u50A8\u5F15\u64CE\u4E3A InnoDB
+    hibernate:
+      ddl-auto: update
+
+server:
+  port: 8181
+
+privateKey: MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAKpbZVfRigHCFa9coYIS6L+vUXCytMVEZ0v8gpb6KCnOcrfsAAHg8tCxeAcs/62e0VwtJRXGcHyrWYsRBGF2j5LTW/s3GeMuu+YIc/oL7FOUgnDbbNaZ0CE+uZwqi5UMz9MW+w/G56+/UwnONSffpHNmYXwmDr7Q3SQDcz2TwudbAgMBAAECgYA/YZe376bX9pzYzK7uVRixUIoNUv+8sTF5bO4tO887lqrJ0Q1DpazRhmWwzcYmk4MzNzyn+FebmqjK+77UgCb0DwBJG9DoTsDsuDSdNqJilJnTxCFSYVd6mA0B0zceik5PqHHFEth6218X8yNXIARuUOJWmiG7YIhMGsdlXiKvgQJBANwtc34ggEE1UN3oQzuwy/tR8CJZn2zTl4OmTTP9Seg5SsqOpqC5wQ96BnSRBMVwvYBXDlWPAZtmqIHvgWhrnZsCQQDGEuKEkqlpdyItsSZKWhyB7fyvvYxA7P//bcqJD6UtzBwbkQwWyCrj8eHS9JbPM3HO+lF2PrvUp2QiUwcwv1lBAkEAysBYACdxs5qjMxW1A/yUeoRDu34IXzCh76tuoJd4PY60nr6qFou3isb1ttXsLNzaxJpmKseb1Ty9o5mn8z5WTQJACtv0MUJ9KTwP0qN4rvDbyT/L77Kbot+bdVyGkxcZfjZHgDdmi0U0HMUhFVi1f+yZG7jbiHkOAS2gLsWQilqjQQJAS+YFBixdw27yqm4G5CvdziU1qVa0+xnNuYYGJpAa+BGSN+pckgpsXEBKvB1DNczA9nrjLM9aqWSiTJOkW4EZTw==
