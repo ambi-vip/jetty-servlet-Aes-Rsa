@@ -52,7 +52,7 @@ public class TokenRsa {
         System.out.println("SID     "+SID);
         //用公钥解锁。解锁后内容与SID比较
         String result = RsaUtil.deWithRSAPublicKey(Signature, publicKey);
-        if (response==null){
+        if (result==null){
             return false;
         }
         if (SID.equals(result)){
