@@ -7,6 +7,7 @@ import serves.UpAndDwServe;
 import until.GetJson;
 import until.RsaUtil;
 import until.SymmetricEncoder;
+import until.TokenRsa;
 
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletContext;
@@ -35,38 +36,21 @@ public class UpAndDwServeImpl implements UpAndDwServe {
     //使用MultipartConfig需要加上这个配置，不加报MultipartConfig不存在
     private static final MultipartConfigElement MULTI_PART_CONFIG = new MultipartConfigElement("E:\\javacode\\SpringBoot\\test\\fileServe");
     private static final long serialVersionUID = 1L;
-    private static final String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCqW2VX0YoBwhWvXKGCEui/r1FwsrTFRGdL/IKW+igpznK37AAB4PLQsXgHLP+tntFcLSUVxnB8q1mLEQRhdo+S01v7NxnjLrvmCHP6C+xTlIJw22zWmdAhPrmcKouVDM/TFvsPxuevv1MJzjUn36RzZmF8Jg6+0N0kA3M9k8LnWwIDAQAB";
-
     private MyFileServe myFileServe = new MyFileServeImpl();
 
     @Override
     public void file2Aes(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+        System.out.println("??????????????");
         String contentType = request.getContentType();
         //判断是不是文件请求。必须加
         if(contentType != null && contentType.startsWith("multipart/")){
-            /*  允许跨域访问 */
-            response.setHeader("Access-Control-Allow-Origin", "*");
-            response.setHeader("Access-Control-Allow-Methods", "*");
-            response.setHeader("Access-Control-Max-Age", "3600");
-            response.addHeader("Access-Control-Allow-Headers", "*");
-            response.setHeader("Access-Control-Allow-Credentials", "*");
             //保存文件信息。存在在数据库中。
             MyFile file = new MyFile();
             //设置文件配置。必须加。
             request.setAttribute(Request.MULTIPART_CONFIG_ELEMENT, MULTI_PART_CONFIG);
-            //说明输入的请求信息采用UTF-8编码方式
-            request.setCharacterEncoding("utf-8");
-            response.setContentType("text/html; charset=UTF-8");
-            PrintWriter out = response.getWriter();
+
             //Servlet3.0中新引入的方法，用来处理multipart/form-data类型编码的表单
-
-            //首先用RSA验证。
-            if (!Aestototo(request)){
-                return;
-            }
-
-
             Part part = request.getPart("file");
             //获取HTTP头信息headerInfo=（form-data; name="file" filename="文件名"）
             String headerInfo = part.getHeader("content-disposition");
@@ -112,13 +96,11 @@ public class UpAndDwServeImpl implements UpAndDwServe {
              * 下载运用AES加密
              */
             InputStream inputStream = part.getInputStream();
-            byte[] getData = readInputStream(inputStream);
+            byte[] getData = TokenRsa.readInputStream(inputStream);
             inputStream.read(getData);
             String str = new String(getData);
 
-//            System.out.println ("打印内容："+str);
             String content = SymmetricEncoder.AESEncode("123", str);
-//            System.out.println(content);
             FileWriter fwriter = null;
             try {
                 fwriter = new FileWriter(fileSavingPath);
@@ -126,6 +108,7 @@ public class UpAndDwServeImpl implements UpAndDwServe {
                 //输出上传成功信息
                 System.out.println("文件上传成功~！");
                 myFileServe.saveFile(file);
+                PrintWriter out = response.getWriter();
                 out.println(GetJson.ok("success",fileSavingPath.replaceAll( "\\\\",   "\\\\\\\\")));
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -164,18 +147,11 @@ public class UpAndDwServeImpl implements UpAndDwServe {
                 String filename = URLEncoder.encode(file.getName(), "UTF-8");
                 System.out.println(filename);
                 /*重置response对象*/
-                resp.reset();
-                resp.setHeader("Access-Control-Allow-Origin", "*");
-                resp.setHeader("Access-Control-Allow-Methods", "*");
-                resp.setHeader("Access-Control-Max-Age", "3600");
-                resp.addHeader("Access-Control-Allow-Headers", "*");
-                resp.setHeader("Access-Control-Allow-Credentials", "*");
-                resp.setCharacterEncoding("UTF-8");
+
                 resp.setHeader("content-type","application/octet-stream;charset=UTF-8");
 //                //3.2设置响应头打开方式：content-disposition
                 resp.setHeader("content-disposition","attachment;filename="+filename);
                 //设置HTTP头信息中内容
-//                resp.addHeader("Content-Disposition","attachment:filename=\"" + filename + "\"" );
                 //设置文件的长度
                 int fileLength = (int)file.length();
                 System.out.println(fileLength);
@@ -209,48 +185,4 @@ public class UpAndDwServeImpl implements UpAndDwServe {
         }
     }
 
-    /**
-     * 读取内容header
-     * @param inputStream
-     * @return
-     * @throws IOException
-     */
-    public static  byte[] readInputStream(InputStream inputStream) throws IOException {
-        byte[] buffer = new byte[4096];
-        int len = 0;
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        while((len = inputStream.read(buffer)) != -1) {
-            bos.write(buffer, 0, len);
-        }
-        bos.close();
-        return bos.toByteArray();
-    }
-
-    /**
-     * 判断SID是否符合要求。
-     * @param request
-     * @return
-     * @throws IOException
-     * @throws ServletException
-     */
-    public boolean Aestototo(HttpServletRequest request) throws IOException, ServletException {
-
-        //获取SID用户随机生成的字符串。
-        Part partSID = request.getPart("X-SID");
-        byte[] getSIDData = readInputStream(partSID.getInputStream());
-        String SID = new String(getSIDData);
-
-        //用户密钥加密后的内容
-        Part partSignature = request.getPart("X-Signature");
-        byte[] getSignatureData = readInputStream(partSignature.getInputStream());
-        String Signature = new String(getSignatureData);
-
-        //用公钥解锁。解锁后内容与SID比较
-        String result = RsaUtil.deWithRSAPublicKey(Signature, publicKey);
-        if (SID.equals(result)){
-            System.out.println("验证成功");
-            return true;
-        }
-        return false;
-    }
 }

@@ -1,12 +1,15 @@
+import Filter.FileFilter;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import servlet.DownLoad;
 import servlet.FileLiset;
 import servlet.Upload;
 
+import javax.servlet.DispatcherType;
 import javax.servlet.annotation.WebFilter;
 import java.io.File;
 import java.net.InetSocketAddress;
+import java.util.EnumSet;
 
 /**
  * @author Ambi
@@ -25,6 +28,7 @@ public class WebAppContextWithWarServer {
         handler.addServlet(Upload.class,"/Upload");
         handler.addServlet(FileLiset.class,"/FileList");
         handler.addServlet(DownLoad.class,"/DownLoad");
+        handler.addFilter(FileFilter.class,"/*", EnumSet.of(DispatcherType.REQUEST));
         server.setHandler(handler);
 
         server.start();

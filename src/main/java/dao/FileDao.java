@@ -140,21 +140,21 @@ public class FileDao {
             Class.forName("org.apache.derby.jdbc.EmbeddedDriver");//加载驱动
             Connection conn = DriverManager.getConnection("jdbc:derby:derbyDB;create=true","user","pwd");
             Statement st = conn.createStatement();
-            st.execute("drop table FILES");
-//            ResultSet rs=st.executeQuery(" select  count(*)  from SYS.SYSTABLES where tablename='FILES' ");
-//            //注意derby数据库中的表明不存在小写，所以如果此处查询结果为小写那就查不到
-//            int k=0;
-//            while(rs.next())
-//            {
-//                if("0".equals(rs.getObject(1).toString()))
-//                    k=-1;
-//            }
-//            if(k==-1)
-//            {
-//                st.execute("create table FILES(UID VARCHAR(50) not null constraint FILES_PK primary key,FILESIZE INTEGER,FILETYPE VARCHAR(10),OLDNAME VARCHAR(20),PATH VARCHAR(255),CREATE_AT TIMESTAMP default CURRENT_TIMESTAMP not null,RBS VARCHAR(255),IS_DEL INTEGER)" );
-//                System.out.println("创建新表");
-//                k=0;
-//            }
+//            st.execute("drop table FILES");
+            ResultSet rs=st.executeQuery(" select  count(*)  from SYS.SYSTABLES where tablename='FILES' ");
+            //注意derby数据库中的表明不存在小写，所以如果此处查询结果为小写那就查不到
+            int k=0;
+            while(rs.next())
+            {
+                if("0".equals(rs.getObject(1).toString()))
+                    k=-1;
+            }
+            if(k==-1)
+            {
+                st.execute("create table FILES(UID VARCHAR(50) not null constraint FILES_PK primary key,FILESIZE INTEGER,FILETYPE VARCHAR(10),OLDNAME VARCHAR(20),PATH VARCHAR(255),CREATE_AT TIMESTAMP default CURRENT_TIMESTAMP not null,RBS VARCHAR(255),IS_DEL INTEGER)" );
+                System.out.println("创建新表");
+                k=0;
+            }
 //
 ////            rs=st.executeQuery(" select max(UID)  from FILES ");
 ////            while(rs.next())
