@@ -4,10 +4,7 @@ import entity.MyFile;
 import org.eclipse.jetty.server.Request;
 import serves.MyFileServe;
 import serves.UpAndDwServe;
-import until.GetJson;
-import until.RsaUtil;
-import until.SymmetricEncoder;
-import until.TokenRsa;
+import until.*;
 
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletContext;
@@ -41,12 +38,14 @@ public class UpAndDwServeImpl implements UpAndDwServe {
     @Override
     public void file2Aes(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        System.out.println("??????????????");
         String contentType = request.getContentType();
         //判断是不是文件请求。必须加
         if(contentType != null && contentType.startsWith("multipart/")){
             //保存文件信息。存在在数据库中。
             MyFile file = new MyFile();
+            //随机生成6位加密数字
+            String randomString = RandomStringUtils.getRandomString(6);
+            file.setRbs(randomString);
             //设置文件配置。必须加。
             request.setAttribute(Request.MULTIPART_CONFIG_ELEMENT, MULTI_PART_CONFIG);
 
@@ -100,7 +99,10 @@ public class UpAndDwServeImpl implements UpAndDwServe {
             inputStream.read(getData);
             String str = new String(getData);
 
-            String content = SymmetricEncoder.AESEncode("123", str);
+            //用上面随机生成6位字符加密
+            String content = SymmetricEncoder.AESEncode(randomString, str);
+
+            //写文件。保存为txt
             FileWriter fwriter = null;
             try {
                 fwriter = new FileWriter(fileSavingPath);
@@ -131,6 +133,7 @@ public class UpAndDwServeImpl implements UpAndDwServe {
         try{
             String uid = req.getParameter("uid");
             System.out.println(uid);
+            //得到这个文件的信息
             MyFile myFile = myFileServe.findByUid(uid);
             System.out.println(myFile.getOldname());
             //服务器相对路径
@@ -151,6 +154,10 @@ public class UpAndDwServeImpl implements UpAndDwServe {
                 resp.setHeader("content-type","application/octet-stream;charset=UTF-8");
 //                //3.2设置响应头打开方式：content-disposition
                 resp.setHeader("content-disposition","attachment;filename="+filename);
+                String SID = myFile.getRbs();
+                String Signature = RsaUtil.encrypt(SID, RsaUtil.getPublicKey(TokenRsa.getPublicKey()));
+                resp.setHeader("Signature",Signature);
+
                 //设置HTTP头信息中内容
                 //设置文件的长度
                 int fileLength = (int)file.length();
