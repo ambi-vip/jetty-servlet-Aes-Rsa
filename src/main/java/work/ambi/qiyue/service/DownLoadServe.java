@@ -1,5 +1,7 @@
 package work.ambi.qiyue.service;
 
+import org.apache.http.Header;
+import org.apache.http.HeaderElement;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -12,8 +14,10 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StreamUtils;
 import work.ambi.qiyue.until.RandomStringUtils;
 import work.ambi.qiyue.until.RsaUtil;
+import work.ambi.qiyue.until.StreamUtil;
 import work.ambi.qiyue.until.SymmetricEncoder;
 
 import javax.servlet.ServletInputStream;
@@ -76,47 +80,52 @@ public class DownLoadServe {
             if (response.getStatusLine().getStatusCode() == 200) {
                 // 解析响应，获取数据
 //                String content = EntityUtils.toString(response.getEntity(), "UTF-8");
+                System.out.println("---------------");
+                Header[] headerArray = response.getAllHeaders();
+                String Rbs ;
+                String RbsSignature = null;
+                for(Header header : headerArray)
+                {
+                    if (header.getName().equals("Signature")){
+                        RbsSignature = header.getValue();
+                        break;
+                    }
+                }
+                Rbs = RsaUtil.decrypt(RbsSignature,RsaUtil.getPrivateKey(privateKey));
+                System.out.println("---------------");
+
+
+
                 HttpEntity httpEntity = response.getEntity();
                 long contentLength = httpEntity.getContentLength();
                 InputStream is = httpEntity.getContent();
                 // 根据InputStream 下载文件
 
-                byte[] getData = readInputStream(is);
+//                byte[] getData = readInputStream(is);
+                byte[] bytes = StreamUtils.copyToByteArray(is);
 //                is.read(getData);
-                String str = new String(getData);
-                String out2File = SymmetricEncoder.AESDncode("123", str);
+                String str = new String(bytes);
+                //解密rbs后对文件解密
+                String out2File = SymmetricEncoder.AESDncode(Rbs, str);
 //                System.out.println(out2File);
+                InputStream strToStream = StreamUtil.getStrToStream(out2File);
+                // 包装成高效流
+                BufferedInputStream bis = new BufferedInputStream(strToStream);
 
                 //解密后的文件。输出到文件。
                 String UUid = UUID.randomUUID().toString();
                 fileSavingPath = fileSavingPath + UUid +filetype;
-                FileWriter fwriter = null;
-                try {
-                    fwriter = new FileWriter(fileSavingPath);
-                    fwriter.write(out2File);
-                    //输出上传成功信息
-                    System.out.println("文件生成成功~！");
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                } finally {
-                    try {
-                        fwriter.flush();
-                        fwriter.close();
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
+                File file = new File(fileSavingPath);
+                BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
+
+                byte[] byt = new byte[1024 * 8];
+                Integer len = -1;
+                while ((len = bis.read(byt)) != -1) {
+                    bos.write(byt, 0, len);
                 }
 
-//                ByteArrayOutputStream output = new ByteArrayOutputStream();
-//                byte[] bytes = out2File.getBytes("utf-8");
-//                System.out.println(new String(bytes));
-//                output.write(bytes,0,out2File.length());
-//
-//                FileOutputStream fos = new FileOutputStream(fileSavingPath);
-//                output.writeTo(fos);
-//                output.flush();
-//                output.close();
-//                fos.close();
+                bos.close();
+                bis.close();
                 EntityUtils.consume(httpEntity);
                 System.out.println("下载成功");
                 return "下载成功";
@@ -130,7 +139,7 @@ public class DownLoadServe {
             }
             // 关闭浏览器
             httpclient.close();
-            return "下载成功";
+            return "下载失败";
         }
     }
 
