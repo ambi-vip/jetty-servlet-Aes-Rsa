@@ -10,7 +10,10 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import work.ambi.qiyue.until.RandomStringUtils;
+import work.ambi.qiyue.until.RsaUtil;
 import work.ambi.qiyue.until.SymmetricEncoder;
 
 import javax.servlet.ServletInputStream;
@@ -36,8 +39,8 @@ public class DownLoadServe {
     private String fileSavingPath = "C:\\Users\\Administrator\\Documents\\java\\b\\";
 
     //私钥
-    private String privateKey = "MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBALwcyvYIGmhk+be320JWWsq1OYjiM0lzv8eHGMgSIOMLxzM/g9X7jguNe8thxJXR/CLqcTgsfZzk8E8Sc9+qnSDxNl5f5tga93vRxd5713zAeAGqLiTQnRffdzRmdbsmu5+0/K8mj056VhKh8FdBNzAj7e4iX9i+uBBG/oDmZbTVAgMBAAECgYEAmgNU5NTDkj9B+Pnt6UU8doSjw3+3j+bV2K2yS3QUOvAUus/Ax7x6ktjWxzCXvDY9IfUil2RNv9vtKEAqYLCWjc+lf8PV/yH1b7NEgyeAPBXtAJRoOnmYL2bdPW92kP9KgxJruF6Dz/C5AmMOncsvq8ABD+9Darn4p8dwj2ZC4O0CQQDf/AHmZsQokEItfCy4mHS9UbxbfIhEUv1ApPh/+Sr7NkJkHWYCtBQo+8jKO6zurAZQgWBPD1XX2UE4R+VIiZazAkEA1wAqtMvGhccyRZr+6kpkpDIa8+9jOE+nGUzqTDvgCID6as8AzOONFVVK6m/UUqkhcJ8Qu1pF36BGojy5BX2KVwJBAJSFpbji0hXXupowqfLp3RcgmNbNWAp+QUJZYhJx5cdYbmO2fssyH+AhPT6knYJR/YnqkDM8hv6vKCkqu2YDHjMCQAOA8TE5EOclM+CGghj3VWSHnIDVKdzFD4gOBNNxNlltIKeU8AJmwunSFgJ0CBXAw9a+ANvMwM7AIeaK7sj0HskCQAvxfDCq7gaNx+pfu0FHG8Gix08A/A6foggBl1fVu+L9sr9ZuOQ3HbXnl28F9ewuB9xdjnLUDjp7W7U0pB+vKoQ=";
-
+    @Value("${privateKey}")
+    private String privateKey ;
 
     public interface HttpClientDownLoadProgress {
         public void onProgress(int progress);
@@ -51,9 +54,14 @@ public class DownLoadServe {
         HttpPost httpPost = new HttpPost("http://localhost:8080/DownLoad");
         // 把自己伪装成浏览器。否则开源中国会拦截访问
         httpPost.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36");
+        String SID= RandomStringUtils.getRandomString(6);
+        String Signature = RsaUtil.enWithRSAPrivateKey(SID, privateKey);
+        httpPost.setHeader("X-SID", SID);
+        httpPost.setHeader("X-Signature", Signature);
 
         // 根据开源中国的请求需要，设置post请求参数
         List<NameValuePair> parameters = new ArrayList<NameValuePair>(0);
+
         parameters.add(new BasicNameValuePair("uid", uid));
         // 构造一个form表单式的实体
         UrlEncodedFormEntity formEntity = new UrlEncodedFormEntity(parameters);

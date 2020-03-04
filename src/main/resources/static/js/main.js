@@ -2,15 +2,26 @@ layui.use('table', function(){
     var table = layui.table,
         $ = layui.$;
 
+    $.ajaxSetup({
+        headers: {'X-SID': $('#SID').val(),
+            'X-Signature':$('#Signature').val(),
+            'Accept':'application/json, text/javascript, */*; q=0.01',
+            'Content-Type':'application/json'
+        }
+    });
+
     table.render({
         elem: '#fileList'
         ,url:'http://localhost:8080/FileList'
         ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+        // ,headers : {'Authorization': "123"}
+        ,xhrFields: true
+        ,crossDomain: true
         ,cols: [[
             {field:'uid', width: '30%', title: 'uid'}
             ,{field:'oldname', width:150, title: '文件名'}
             ,{field:'createAt', width:200, title: '上传时间', sort: true}
-            ,{field:'filetype', width:200, title: '文件类型', sort: true}
+            ,{field:'filetype', width:80, title: '文件类型', sort: true}
             ,{field:'fileSize',minWidth: 100, title: '文件大小(KB)',templet: function(res){
                     return res.fileSize +'KB'
                 }}

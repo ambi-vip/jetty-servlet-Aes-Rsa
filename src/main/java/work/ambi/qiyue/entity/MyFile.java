@@ -3,10 +3,6 @@ package work.ambi.qiyue.entity;
 import lombok.Data;
 import lombok.Generated;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import javax.sql.DataSource;
 import java.sql.Date;
 
@@ -16,11 +12,9 @@ import java.sql.Date;
  * @date 2020/2/29 16:29
  */
 @Data
-@Entity
-@Table(name = "files")
+
 public class MyFile {
 
-    @Id
     private String uid;
     private String filetype;
     private String oldname;
