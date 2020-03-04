@@ -18,12 +18,12 @@ layui.use('table', function(){
         ,xhrFields: true
         ,crossDomain: true
         ,cols: [[
-            {field:'uid', width: '30%', title: 'uid'}
+            {field:'uid', width: '25%', title: 'uid'}
             ,{field:'oldname', width:150, title: '文件名'}
-            ,{field:'createAt', width:200, title: '上传时间', sort: true}
+            ,{field:'createAt', width:180, title: '上传时间', sort: true}
             ,{field:'filetype', width:80, title: '文件类型', sort: true}
-            ,{field:'rbs', width:80, title: '加密信息'}
-            ,{field:'fileSize',minWidth: 100, title: '文件大小(KB)',templet: function(res){
+            ,{field:'rbs', width:120, title: '加密信息'}
+            ,{field:'fileSize',Width: 100, title: '文件大小(KB)',templet: function(res){
                     return res.fileSize +'KB'
                 }}
             ,{fixed: 'right', title:'操作', toolbar: '#bar', width:150}
