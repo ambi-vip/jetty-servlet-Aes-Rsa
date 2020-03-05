@@ -5,6 +5,10 @@ jetty-servlet-Aes-Rsa
 
 [开发文档](http://blog.ambitlu.work/java/20200301-536c2f1e/)
 
+branch说明：master是serve端代码。client是client端代码，jpaclient是二者整合的代码（需要配置环境，不建议使用）。
+client端启动后（端口为8181）。访问：http://localhost:8181/swagger-ui.html#/    查看api接口。
+
+
 下面内容全部完成
 
 #### Server 端功能需求： 
@@ -15,8 +19,22 @@ jetty-servlet-Aes-Rsa
  
 2. 下载文件接口： 
 
-响应客户端获取文件流的get 请求，客户端参数为接口1 中返回的UUID， 在响应中写入文件流，无其他返回值，异常响应时返回410 状态码。 3. 获取文件元数据接口： 响应客户端get 请求，客户端参数为接口1 中返回的UUID，返回值为Json 格式的元数据信息。 4. 接口权限校验： 以上所有接口在调用前服务端均需要校验客户端权限，校验规则为RSA 签 名校验，Server 端持有公钥，客户端持有私钥，客户端向服务端发送请求 时，需要在Header 中添加X-SID 和X-Signature 两个属性，SID 为客户端随机 生成的字符串，Signature 为客户端使用私钥对SID 签名后的签名数据，服务
-端获取Header 中的SID 和Signature 参数后，用公钥对SID 和Signature 验 签，来验证是否是合法的客户端请求，不合法的请求返回403 状态码。 5. 扩展： 文件查询接口，最近上传的10 个文件的元数据Json 数组。 Server 端技术要求： 项目基于Maven 构建，WEB 服务使用嵌入式Jetty 实现，相关接口使用原生 Sevlet 或Filter 实现，不得使用SpringFramework 或其他第三方MVC 框架，数据 访问使用原生JDBC 实现，不得使用第三方数据库访问框架，数据库使用Derby 嵌入式数据库，随服务一起启动，除Jetty、Logger、Derby 和Junit 外，尽量不 引入其他第三方依赖。1、2、3、4 为必须完成部分，扩展部分不做要求，根据 个人情况自愿完成。Server 端持有公钥在接口1 和4 中是同一个秘钥。 
+响应客户端获取文件流的get 请求，客户端参数为接口1 中返回的UUID， 在响应中写入文件流，无其他返回值。 
+
+3. 获取文件元数据接口： 
+
+响应客户端get 请求，客户端参数为接口1 中返回的UUID，返回值为Json 格式的元数据信息。 
+
+4. 接口权限校验： 
+
+以上所有接口在调用前服务端均需要校验客户端权限，校验规则为RSA 签 名校验，Server 端持有公钥，客户端持有私钥，客户端向服务端发送请求 时，需要在Header 中添加X-SID 和X-Signature 两个属性，SID 为客户端随机 生成的字符串，Signature 为客户端使用私钥对SID 签名后的签名数据，服务
+端获取Header 中的SID 和Signature 参数后，用公钥对SID 和Signature 验 签，来验证是否是合法的客户端请求，不合法的请求返回403 状态码。 
+
+5. 扩展： 
+
+文件查询接口，最近上传的10 个文件的元数据Json 数组。 
+
+Server 端技术要求： 项目基于Maven 构建，WEB 服务使用嵌入式Jetty 实现，相关接口使用原生 Sevlet 或Filter 实现，不得使用SpringFramework 或其他第三方MVC 框架，数据 访问使用原生JDBC 实现，不得使用第三方数据库访问框架，数据库使用Derby 嵌入式数据库，随服务一起启动，除Jetty、Logger、Derby 和Junit 外，引入其他第三方依赖。Server 端持有公钥在接口1 和4 中是同一个秘钥。 
 
 
 Client 端功能需求： 1. Client 端Web 服务： 使用SpringMVC（其他MVC 框架不限）框架实现简单的web 应用，可以响 应前端页面请求，接收前端上传的文件，接收到的文件需要调用Server 端 的文件上传接口，将文件上传至文件服务器，然后调用服务端的的元数据接 口获取文件详细信息返回给前端，响应前端的下载接口，从Server 端下载 文件，解密后返回给前端。 
@@ -30,4 +48,4 @@ Client 端功能需求： 1. Client 端Web 服务： 使用SpringMVC（其他MVC
 4. 列表展示，调用Server 端的查询接口，最近上传的文件列表； 
 
 
-Client 端技术要求： 项目基于Maven 构建，WEB 服务使用的第三方框架和依赖不限，使用 SpringBoot 技术。
+Client 端技术要求： 项目基于SpringBoot构建，WEB 服务使用的第三方框架和依赖不限，使用Layui技术。
